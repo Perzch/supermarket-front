@@ -1,0 +1,13 @@
+@import './tailwind.scss';
+@font-face {
+    font-family: 'Oblique';
+    src: url('../font/SmileySans-Oblique.ttf');
+}
+@font-face {
+    font-family: 'XiHei';
+    src: url('../font/LXGWNeoXiHei.ttf');
+}
+div,span,p,i,img,section,main,header,footer,form,input,button,select,a,nav,article,aside {
+  font-family: 'XiHei';
+  @apply duration-200 ease-in-out transition-all;
+}
