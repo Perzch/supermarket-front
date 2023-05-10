@@ -87,40 +87,66 @@ const submitForm = async () => {
 </script>
 
 <template>
-    <div class="warp" v-loading="loading">
-        <el-table border  :data="tableData" @sort-change="sortChange" >
-            <el-table-column prop="id" label="编号" sortable="custom"/>
-            <el-table-column prop="name" label="分类名称" sortable="custom"/>
-            <el-table-column prop="recommend" label="推荐指数" sortable="custom"/>
-            <el-table-column label="操作">
-                <template #default="scope">
-                    <el-button type="primary" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-                    <el-button type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <div class="flex justify-center py-4">
-            <el-button size="large" type="success" @click="handleAdd">添加</el-button>
+    <div class="warp">
+        <div class="uiverse" v-loading="loading">
+            <div class="tools">
+              <div class="circle">
+                <span class="box bg-red-500"></span>
+              </div>
+              <div class="circle">
+                <span class="box bg-yellow-500"></span>
+              </div>
+              <div class="circle">
+                <span class="box bg-blue-500"></span>
+              </div>
+            </div>
+            <p class="text-center text-4xl py-4 font-bold">湖南工业学院校内超市商品分类信息</p>
+            <el-table border  :data="tableData" @sort-change="sortChange" >
+                <el-table-column prop="id" label="编号" sortable="custom"/>
+                <el-table-column prop="name" label="分类名称" sortable="custom"/>
+                <el-table-column prop="recommend" label="推荐指数" sortable="custom"/>
+                <el-table-column label="操作">
+                    <template #default="scope">
+                        <el-button type="primary" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="flex justify-center py-4">
+                <el-button size="large" type="success" @click="handleAdd">添加</el-button>
+            </div>
+            <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="30%">
+                <el-form :model="editInfo" label-position="top">
+                    <el-form-item label="分类名称" label-width="auto">
+                        <el-input v-model="editInfo.name" autocomplete="off" />
+                    </el-form-item>
+                    <el-form-item label="推荐指数" label-width="auto">
+                        <el-input v-model="editInfo.recommend" autocomplete="off" />
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button size="large" type="primary" @click="submitForm()">提交</el-button>
+                        <el-button size="large" @click="dialogFormVisible = false">取消</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-dialog>
         </div>
-        <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="30%">
-            <el-form :model="editInfo" label-position="top">
-                <el-form-item label="分类名称" label-width="auto">
-                    <el-input v-model="editInfo.name" autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="推荐指数" label-width="auto">
-                    <el-input v-model="editInfo.recommend" autocomplete="off" />
-                </el-form-item>
-                <el-form-item>
-                    <el-button size="large" type="primary" @click="submitForm()">提交</el-button>
-                    <el-button size="large" @click="dialogFormVisible = false">取消</el-button>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
     </div>
 </template>
 
 <style scoped lang="scss">
 .warp {
     @apply w-5/6 mx-auto my-4;
+}
+.uiverse {
+    @apply mx-auto bg-white rounded-md border;
+    .tools {
+        @apply flex items-center p-2 gap-1;
+        .circle {
+            @apply py-1;
+            .box {
+                @apply inline-block align-middle w-4 h-4 rounded-full;
+            }
+        }
+    }
 }
 </style>
