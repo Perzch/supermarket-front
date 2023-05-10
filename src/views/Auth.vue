@@ -1,15 +1,20 @@
 <script setup>
-import { reactive } from 'vue';
-import MyButton from 'components/MyButton.vue';
-import { api,request } from 'request'
+import {reactive, ref, onUnmounted} from 'vue';
+import {useAuthStore} from "store";
+import {useRouter} from "vue-router";
+const router = useRouter()
+const authStore = useAuthStore()
 const user = reactive({
     username: '',
-    password: ''
+    password: '',
+    captcha: ''
 })
 const error = reactive({
     username: false,
-    password: false
+    password: false,
+    captcha: false
 })
+let captchaImg = ref('/api/auth/captcha?'+Math.random())
 // 验证用户名
 const validateUsername = () => {
     error.username = user.username.trim().length < 3 || user.username.trim().length > 10;
@@ -18,19 +23,30 @@ const validateUsername = () => {
 const validatePassword = () => {
     error.password = user.password.trim().length < 6 || user.password.trim().length > 18;
 }
+const validateCaptcha = () => {
+    error.captcha = !user.captcha.trim();
+}
 // 登录方法
 const login = async () => {
     validateUsername()
     validatePassword()
+    validateCaptcha()
     if (error.username || error.password) {
         return
     }
-    const res = await request({
-        url: api.login,
-        method: 'post',
-        data: user
-    })
+    if(await authStore.login({...user})) await router.push('/')
 }
+const windowKeyDown = (e) => {
+    if (e.keyCode === 13) {
+        login()
+    }
+}
+// 监听回车键
+window.addEventListener('keydown', windowKeyDown)
+onUnmounted(() => {
+    // 取消监听回车键
+    window.removeEventListener('keydown', windowKeyDown)
+})
 </script>
 <template>
     <div class="warp">
@@ -55,9 +71,20 @@ const login = async () => {
                         </el-input>
                         <el-text class="mx-1" type="danger" v-show="error.password" size="small">密码长度为6-18位</el-text>
                     </el-form-item>
+                    <el-form-item prop="captcha">
+                        <template #label>验证码</template>
+                        <img :src="captchaImg" alt="图片验证码" title="点击再次获取验证码" @click="captchaImg = '/api/auth/captcha?'+Math.random()" class="cursor-pointer">
+                        <el-input v-model="user.captcha" placeholder="验证码" clearable :class="{'error-input':error.captcha}" @blur="validateCaptcha">
+                            <template #suffix>
+                                <i class="fa-solid fa-triangle-exclamation text-danger" v-show="error.captcha"></i>
+                            </template>
+                        </el-input>
+                        <el-text class="mx-1" type="danger" v-show="error.captcha" size="small">验证码不能为空</el-text>
+                    </el-form-item>
                 </el-form>
                 <div class="w-full items-center flex justify-between">
-                    <my-button class="duration-300" @click="login">登录</my-button>
+                    <div></div>
+                    <el-button @click="login" size="large" type="primary">登录</el-button>
                 </div>
             </div>
     </div>

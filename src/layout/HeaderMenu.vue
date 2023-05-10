@@ -1,0 +1,43 @@
+<script setup>
+import {ref,onMounted} from "vue";
+import {useRoute} from "vue-router";
+import { useAuthStore } from 'store';
+const route = useRoute()
+const store = useAuthStore()
+
+const activeIndex = ref(route.path)
+onMounted(() => {
+    let username = localStorage.getItem('username');
+    if(username && !store.username) {
+        store.username = username
+    }
+})
+</script>
+
+<template>
+    <el-menu
+            :router = "true"
+            :default-active="activeIndex"
+            :ellipsis="false"
+            mode="horizontal"
+            class="px-4"
+    >
+        <el-menu-item index="/cashier">收银台</el-menu-item>
+        <el-menu-item index="/category">商品分类管理</el-menu-item>
+        <el-menu-item index="/product">商品库存管理</el-menu-item>
+        <el-menu-item index="/sale">销售统计</el-menu-item>
+        <div class="flex-grow" />
+        <el-dropdown class="justify-center items-center" @command="store.exit">
+            <span>{{store.username}}</span>
+            <template #dropdown>
+                <el-dropdown-menu>
+                    <el-dropdown-item>退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
+    </el-menu>
+</template>
+
+<style scoped lang="scss">
+
+</style>

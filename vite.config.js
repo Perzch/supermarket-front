@@ -16,6 +16,7 @@ export default defineConfig({
               rewrite: (path) => path.replace(/^\/api/, ""),
           },
       },
+      port: 8888
   },
   resolve: {
     alias: {
