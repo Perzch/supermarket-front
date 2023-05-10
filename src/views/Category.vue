@@ -64,12 +64,9 @@ const handleDelete = (index, row) => {
 const submitForm = async () => {
     loading.value = true
     const config = {
-        method: 'put',
+        method: cur.value === '添加分类'?'post':'put',
         url: api.category,
         data: editInfo.value
-    }
-    if(cur.value === '添加分类') {
-        config.method = 'post'
     }
     const res = (await request(config)).data
     if(res.code === 200) {
@@ -138,7 +135,7 @@ const submitForm = async () => {
     @apply w-full mx-auto flex items-center;
 }
 .uiverse {
-    @apply mx-auto w-5/6 rounded-md border bg-slate-100 p-4;
+    @apply mx-auto w-11/12 rounded-lg border bg-slate-100 p-4 bg-opacity-80 backdrop-blur-sm;
     .tools {
         @apply flex items-center p-2 gap-1;
         .circle {

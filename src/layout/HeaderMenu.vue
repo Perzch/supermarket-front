@@ -21,7 +21,7 @@ onMounted(() => {
             :ellipsis="false"
             mode="vertical"
             popper-effect="light"
-            class="py-4">
+            class="py-4 menu">
         <el-menu-item index="/cashier">收银台</el-menu-item>
         <el-menu-item index="/category">商品分类管理</el-menu-item>
         <el-menu-item index="/product">商品库存管理</el-menu-item>
@@ -41,5 +41,13 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-
+.menu {
+    @apply bg-opacity-10 bg-white backdrop-blur-sm text-black;
+    :deep(.el-menu-item),:deep(.el-tooltip__trigger) {
+        @apply text-gray-800;
+    }
+    :deep(.is-active){
+        @apply text-black bg-gray-200 bg-opacity-70;
+    }
+}
 </style>

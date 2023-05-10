@@ -7,3 +7,8 @@ import HeaderMenu from "@/layout/HeaderMenu.vue";
     <router-view></router-view>
   </div>
 </template>
+<style scoped>
+  div{
+    background: url('../assets/unnamed.png') center/cover no-repeat fixed;
+  }
+</style>

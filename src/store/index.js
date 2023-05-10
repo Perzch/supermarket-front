@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import { api,request } from 'request'
+import { ElNotification } from "element-plus";
 export const useAuthStore = defineStore('auth',() => {
     const username = ref('')
     const token = ref('')
