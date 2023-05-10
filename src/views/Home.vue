@@ -2,6 +2,8 @@
 import HeaderMenu from "@/layout/HeaderMenu.vue";
 </script>
 <template>
-  <header-menu></header-menu>
-  <router-view></router-view>
+  <div class="flex h-screen">
+    <header-menu></header-menu>
+    <router-view></router-view>
+  </div>
 </template>

@@ -19,22 +19,24 @@ onMounted(() => {
             :router = "true"
             :default-active="activeIndex"
             :ellipsis="false"
-            mode="horizontal"
-            class="px-4"
-    >
+            mode="vertical"
+            popper-effect="light"
+            class="py-4">
         <el-menu-item index="/cashier">收银台</el-menu-item>
         <el-menu-item index="/category">商品分类管理</el-menu-item>
         <el-menu-item index="/product">商品库存管理</el-menu-item>
         <el-menu-item index="/sale">销售统计</el-menu-item>
         <div class="flex-grow" />
-        <el-dropdown class="justify-center items-center" @command="store.exit">
-            <span>{{store.username}}</span>
-            <template #dropdown>
-                <el-dropdown-menu>
-                    <el-dropdown-item>退出登录</el-dropdown-item>
-                </el-dropdown-menu>
-            </template>
-        </el-dropdown>
+        <el-menu-item>
+            <el-dropdown class="justify-center items-center" @command="store.exit">
+                <div>你好！{{store.username}}</div>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item>退出登录</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+        </el-menu-item>
     </el-menu>
 </template>
 

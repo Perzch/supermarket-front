@@ -101,7 +101,7 @@ const submitForm = async () => {
               </div>
             </div>
             <p class="text-center text-4xl py-4 font-bold">湖南工业学院校内超市商品分类信息</p>
-            <el-table border  :data="tableData" @sort-change="sortChange" >
+            <el-table border  :data="tableData" @sort-change="sortChange" header-row-class-name="text-black">
                 <el-table-column prop="id" label="编号" sortable="custom"/>
                 <el-table-column prop="name" label="分类名称" sortable="custom"/>
                 <el-table-column prop="recommend" label="推荐指数" sortable="custom"/>
@@ -135,10 +135,10 @@ const submitForm = async () => {
 
 <style scoped lang="scss">
 .warp {
-    @apply w-5/6 mx-auto my-4;
+    @apply w-full mx-auto flex items-center;
 }
 .uiverse {
-    @apply mx-auto bg-white rounded-md border;
+    @apply mx-auto w-5/6 rounded-md border bg-slate-100 p-4;
     .tools {
         @apply flex items-center p-2 gap-1;
         .circle {
