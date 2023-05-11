@@ -71,10 +71,9 @@ const downloadAllData = () => {
         method: 'get',
         responseType: 'blob'
     }).then(res => {
-        const link = document.createElement('a')
-        link.href = URL.createObjectURL(res.data)
-        link.download= '湖南工业学院校内超市商品销售记录.xls'
-        link.click()
+        const url = URL.createObjectURL(res.data)
+        window.open(url)
+        URL.revokeObjectURL(url)
     })
 }
 
@@ -86,7 +85,6 @@ onMounted(async () => {
         method: 'get'
     })).data
     categoryNames.value = res.data
-    categoryNames.value.sort()
     loading.value = false
 })
 </script>
