@@ -20,7 +20,14 @@ const sortColumn = ref('')
 const page = ref(0)
 const loading = ref(false)
 const dialogFormVisible = ref(false)
-const CategoryList = ref([])
+const categoryNames = ref([])
+const pageComputed = computed({
+    get: () => page.value +1,
+    set: val => {
+        page.value = val -1
+        getData()
+    }
+})
 
 watchEffect(() => {
     if(!yieldDateArray.value) {
@@ -134,10 +141,11 @@ onMounted(async () => {
     loading.value = true
     getData();
     const res = (await request({
-        url: api.category,
+        url: api.categoryNames,
         method: 'get'
     })).data
-    CategoryList.value = res.data
+    categoryNames.value = res.data
+    categoryNames.value.sort()
     loading.value = false
 })
 </script>
@@ -145,17 +153,17 @@ onMounted(async () => {
 <template>
     <div class="warp" v-loading="loading">
         <table-layout tableTitle="湖南工业学院校内超市商品库存信息">
-            <el-form label-position="left" class="flex gap-4 justify-around">
+            <el-form label-position="left" class="flex justify-around gap-4" size="large">
                 <el-form-item label="商品名称:" class="items-center">
                     <el-input v-model="queryData.name" placeholder="商品名称" />
                 </el-form-item>
                 <el-form-item label="商品类别:" class="items-center">
-                    <el-select v-model="queryData.categoryName" placeholder="Select" size="large" clearable >
+                    <el-select v-model="queryData.categoryName" filterable placeholder="Select" clearable >
                         <el-option
-                        v-for="item in CategoryList"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.name"
+                        v-for="item in categoryNames"
+                        :key="item"
+                        :label="item"
+                        :value="item"
                         />
                     </el-select>
                 </el-form-item>
@@ -168,7 +176,6 @@ onMounted(async () => {
                         end-placeholder="年-月-日"
                         format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD"
-                        size="large"
                     />
                 </el-form-item>
                 <el-form-item>
@@ -195,8 +202,9 @@ onMounted(async () => {
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="flex justify-end p-2">
-                <el-pagination layout="prev, pager, next" background :hide-on-single-page="true" :total="tableData.totalElements" :current-page="page + 1"/>
+            <div class="flex justify-between p-2">
+                <p class="w-fit text-sm text-gray-500">共{{ tableData.totalElements }}条数据</p>
+                <el-pagination layout="prev, pager, next" background :hide-on-single-page="true" :page-count="tableData.totalPages" v-model:current-page="pageComputed"/>
             </div>
         </table-layout>
         <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="50%">
@@ -204,10 +212,10 @@ onMounted(async () => {
                 <el-form-item label="分类名称:">
                     <el-select v-model="editInfo.categoryName" placeholder="分类名称" clearable >
                         <el-option
-                        v-for="item in CategoryList"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.name"
+                        v-for="item in categoryNames"
+                        :key="item"
+                        :label="item"
+                        :value="item"
                         />
                     </el-select>
                 </el-form-item>

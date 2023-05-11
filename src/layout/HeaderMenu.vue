@@ -42,7 +42,9 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .menu {
-    @apply bg-opacity-10 bg-white backdrop-blur-sm text-black;
+    mask: linear-gradient(to left, transparent 0%, black 20%);
+    @apply backdrop-blur-md bg-white bg-opacity-0 text-black border-0;
+    // @apply after:w-full after:h-full after:absolute after:top-0 after:backdrop-blur-md after:-z-1;
     :deep(.el-menu-item),:deep(.el-tooltip__trigger) {
         @apply text-gray-800;
     }

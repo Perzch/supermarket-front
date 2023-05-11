@@ -20,7 +20,7 @@ defineProps(['tableTitle'])
 </template>
 <style lang='scss' scoped>
 .uiverse {
-    @apply mx-auto w-11/12 rounded-lg border bg-slate-100 p-4 bg-opacity-80 backdrop-blur-sm;
+    @apply mx-auto w-fit rounded-lg border bg-slate-100 p-6 bg-opacity-80 backdrop-blur-sm;
     .tools {
         @apply flex items-center p-2 gap-1;
         .circle {

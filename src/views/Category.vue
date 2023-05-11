@@ -88,7 +88,10 @@ const submitForm = async () => {
 <template>
     <div class="warp" v-loading="loading">
         <table-layout tableTitle="湖南工业学院校内超市商品分类信息">
-            <el-table border  :data="tableData" @sort-change="sortChange" header-row-class-name="text-black">
+            <div class="flex justify-end py-4">
+                <el-button size="large" type="success" @click="handleAdd">添加</el-button>
+            </div>
+            <el-table border  :data="tableData" @sort-change="sortChange" header-row-class-name="text-black" table-layout="auto">
                 <el-table-column prop="id" label="编号" sortable="custom"/>
                 <el-table-column prop="name" label="分类名称" sortable="custom"/>
                 <el-table-column prop="recommend" label="推荐指数" sortable="custom"/>
@@ -99,9 +102,7 @@ const submitForm = async () => {
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="flex justify-center py-4">
-                <el-button size="large" type="success" @click="handleAdd">添加</el-button>
-            </div>
+            <p class="w-fit text-sm text-gray-500">共{{ tableData.length }}条数据</p>
         </table-layout>
         <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="30%">
             <el-form :model="editInfo" label-position="top">
@@ -123,17 +124,5 @@ const submitForm = async () => {
 <style scoped lang="scss">
 .warp {
     @apply w-full mx-auto flex items-center;
-}
-.uiverse {
-    @apply mx-auto w-11/12 rounded-lg border bg-slate-100 p-4 bg-opacity-80 backdrop-blur-sm;
-    .tools {
-        @apply flex items-center p-2 gap-1;
-        .circle {
-            @apply py-1;
-            .box {
-                @apply inline-block align-middle w-4 h-4 rounded-full;
-            }
-        }
-    }
 }
 </style>

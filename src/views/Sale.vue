@@ -10,12 +10,19 @@ const queryData = ref({
     startYieldDate: '',
     endYieldDate: ''
 })
-const CategoryList = ref([])
+const categoryNames = ref([])
 const yieldDateArray = ref([])
 const sort = ref('')
 const sortColumn = ref('')
 const page = ref(0)
 const loading = ref(false)
+const pageComputed = computed({
+    get: () => page.value +1,
+    set: val => {
+        page.value = val -1
+        getData()
+    }
+})
 
 watchEffect(() => {
     if(!yieldDateArray.value) {
@@ -52,21 +59,34 @@ const getData = async () => {
     }
     loading.value = false
 }
-
 const sortChange = async column => {
     sort.value = column.order
     sortColumn.value = column.prop
     if(!column.order) return
     getData()
 }
+const downloadAllData = () => {
+    request({
+        url: api.printSales,
+        method: 'get',
+        responseType: 'blob'
+    }).then(res => {
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(res.data)
+        link.download= '湖南工业学院校内超市商品销售记录.xls'
+        link.click()
+    })
+}
+
 onMounted(async () => {
     loading.value = true
     getData();
     const res = (await request({
-        url: api.category,
+        url: api.categoryNames,
         method: 'get'
     })).data
-    CategoryList.value = res.data
+    categoryNames.value = res.data
+    categoryNames.value.sort()
     loading.value = false
 })
 </script>
@@ -76,12 +96,12 @@ onMounted(async () => {
         <table-layout tableTitle="湖南工业学院校内超市商品销售记录">
             <el-form label-position="left" class="flex gap-4 justify-around">
                 <el-form-item label="商品类别:" class="items-center">
-                    <el-select v-model="queryData.categoryName" placeholder="Select" size="large" clearable >
+                    <el-select v-model="queryData.categoryName" filterable placeholder="Select" size="large" clearable >
                         <el-option
-                        v-for="item in CategoryList"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.name"
+                        v-for="item in categoryNames"
+                        :key="item"
+                        :label="item"
+                        :value="item"
                         />
                     </el-select>
                 </el-form-item>
@@ -119,9 +139,12 @@ onMounted(async () => {
                         <span>{{ (scope.row.product.nowPrice - scope.row.product.price) * scope.row.saleCount }}</span>
                     </template>
                 </el-table-column>
+                <el-table-column prop="createDate" label="创建时间" sortable="custom"/>
             </el-table>
-            <div class="flex justify-end p-2">
-                <el-pagination layout="prev, pager, next" background :hide-on-single-page="true" :total="tableData.totalElements" :current-page="page + 1"/>
+            <div class="flex justify-between p-2">
+                <p class="w-fit text-sm text-gray-500">共{{ tableData.totalElements }}条数据</p>
+                <el-button type="success" @click="downloadAllData">下载全部数据</el-button>
+                <el-pagination layout="prev, pager, next" background :hide-on-single-page="true" :page-count="tableData.totalPages" v-model:current-page="pageComputed"/>
             </div>
         </table-layout>
     </div>
