@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watchEffect } from 'vue';
 import { api, request } from 'request'
 import { ElNotification,ElMessageBox } from 'element-plus';
+import TableLayout from 'components/TableLayout.vue';
 
 const tableData = ref([])
 const editInfo = ref({
@@ -75,7 +76,6 @@ const handleAdd = () => {
 }
 const handleAddCount = (index,row) => {
     loading.value = true
-    console.log(row)
     ElMessageBox.prompt('请输入需要增加的库存数量', '增加库存', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
@@ -94,11 +94,10 @@ const handleAddCount = (index,row) => {
             ElNotification.warning(res.message)
             row.stock -= Number(value);
         }
-        loading.value = false
     })
+    loading.value = false
 }
 const handleDelete = (index, row) => {
-    console.log(row);
     ElMessageBox.confirm('此操作将永久删除该商品, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -144,21 +143,9 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="warp">
-        <div class="uiverse" v-loading="loading">
-            <div class="tools">
-              <div class="circle">
-                <span class="box bg-red-500"></span>
-              </div>
-              <div class="circle">
-                <span class="box bg-yellow-500"></span>
-              </div>
-              <div class="circle">
-                <span class="box bg-blue-500"></span>
-              </div>
-            </div>
-            <p class="text-center text-4xl py-4 font-bold">湖南工业学院校内超市商品库存信息</p>
-            <el-form label-position="left" class="flex gap-4">
+    <div class="warp" v-loading="loading">
+        <table-layout tableTitle="湖南工业学院校内超市商品库存信息">
+            <el-form label-position="left" class="flex gap-4 justify-around">
                 <el-form-item label="商品名称:" class="items-center">
                     <el-input v-model="queryData.name" placeholder="商品名称" />
                 </el-form-item>
@@ -186,8 +173,6 @@ onMounted(async () => {
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getData">查询</el-button>
-                </el-form-item>
-                <el-form-item>
                     <el-button type="success" @click="handleAdd">添加</el-button>
                 </el-form-item>
             </el-form>
@@ -210,62 +195,65 @@ onMounted(async () => {
                     </template>
                 </el-table-column>
             </el-table>
-            <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="50%">
-                <el-form :model="editInfo" label-position="right" label-width="auto" :inline="true" size="large">
-                    <el-form-item label="分类名称:">
-                        <el-select v-model="editInfo.categoryName" placeholder="分类名称" clearable >
-                            <el-option
-                            v-for="item in CategoryList"
-                            :key="item.id"
-                            :label="item.name"
-                            :value="item.name"
-                            />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="名称:">
-                        <el-input v-model="editInfo.name" placeholder="名称"/>
-                    </el-form-item>
-                    <el-form-item label="生产日期:">
-                        <el-date-picker
-                            v-model="editInfo.yieldDate"
-                            type="date"
-                            format="YYYY-MM-DD"
-                            value-format="YYYY-MM-DD"
-                            placeholder="生产日期"
+            <div class="flex justify-end p-2">
+                <el-pagination layout="prev, pager, next" background :hide-on-single-page="true" :total="tableData.totalElements" :current-page="page + 1"/>
+            </div>
+        </table-layout>
+        <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="50%">
+            <el-form :model="editInfo" label-position="right" label-width="auto" :inline="true" size="large">
+                <el-form-item label="分类名称:">
+                    <el-select v-model="editInfo.categoryName" placeholder="分类名称" clearable >
+                        <el-option
+                        v-for="item in CategoryList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.name"
                         />
-                    </el-form-item>
-                    <el-form-item label="厂家:">
-                        <el-input v-model="editInfo.manufacturers" placeholder="厂家"/>
-                    </el-form-item>
-                    <el-form-item label="进货日期:">
-                        <el-date-picker
-                            v-model="editInfo.createDate"
-                            type="date"
-                            format="YYYY-MM-DD"
-                            value-format="YYYY-MM-DD"
-                            placeholder="进货日期"
-                        />
-                    </el-form-item>
-                    <br>
-                    <el-form-item label="库存数:">
-                        <el-input-number v-model="editInfo.stock" :min="0" placeholder="库存数"/>
-                    </el-form-item>
-                    <el-form-item label="售价:">
-                        <el-input-number v-model="editInfo.nowPrice" :min="0" placeholder="售价"/>
-                    </el-form-item>
-                    <el-form-item label="售出数:">
-                        <el-input-number v-model="editInfo.saleCount" :min="0" placeholder="售出数"/>
-                    </el-form-item>
-                    <el-form-item label="进价:">
-                        <el-input-number v-model="editInfo.price" :min="0"/>
-                    </el-form-item>
-                </el-form>
-                <template #footer>
-                    <el-button size="large" type="primary" @click="submitForm()">提交</el-button>
-                    <el-button size="large" @click="dialogFormVisible = false">取消</el-button>
-                </template>
-            </el-dialog>
-        </div>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="名称:">
+                    <el-input v-model="editInfo.name" placeholder="名称"/>
+                </el-form-item>
+                <el-form-item label="生产日期:">
+                    <el-date-picker
+                        v-model="editInfo.yieldDate"
+                        type="date"
+                        format="YYYY-MM-DD"
+                        value-format="YYYY-MM-DD"
+                        placeholder="生产日期"
+                    />
+                </el-form-item>
+                <el-form-item label="厂家:">
+                    <el-input v-model="editInfo.manufacturers" placeholder="厂家"/>
+                </el-form-item>
+                <el-form-item label="进货日期:">
+                    <el-date-picker
+                        v-model="editInfo.createDate"
+                        type="date"
+                        format="YYYY-MM-DD"
+                        value-format="YYYY-MM-DD"
+                        placeholder="进货日期"
+                    />
+                </el-form-item>
+                <br>
+                <el-form-item label="库存数:">
+                    <el-input-number v-model="editInfo.stock" :min="0" placeholder="库存数"/>
+                </el-form-item>
+                <el-form-item label="售价:">
+                    <el-input-number v-model="editInfo.nowPrice" :min="0" placeholder="售价"/>
+                </el-form-item>
+                <el-form-item label="售出数:">
+                    <el-input-number v-model="editInfo.saleCount" :min="0" placeholder="售出数"/>
+                </el-form-item>
+                <el-form-item label="进价:">
+                    <el-input-number v-model="editInfo.price" :min="0"/>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button size="large" type="primary" @click="submitForm()">提交</el-button>
+                <el-button size="large" @click="dialogFormVisible = false">取消</el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -273,17 +261,4 @@ onMounted(async () => {
 .warp {
     @apply w-full mx-auto flex items-center;
 }
-.uiverse {
-    @apply mx-auto w-11/12 rounded-lg border bg-slate-100 p-4 bg-opacity-80 backdrop-blur-sm;
-    .tools {
-        @apply flex items-center p-2 gap-1;
-        .circle {
-            @apply py-1;
-            .box {
-                @apply inline-block align-middle w-4 h-4 rounded-full;
-            }
-        }
-    }
-}
-
 </style>

@@ -2,6 +2,8 @@
 import {ref,onMounted} from "vue";
 import { api, request } from 'request'
 import { ElMessageBox, ElNotification } from "element-plus";
+import TableLayout from 'components/TableLayout.vue'
+
 const tableData = ref([])
 const editInfo = ref({})
 const cur = ref('')
@@ -84,20 +86,8 @@ const submitForm = async () => {
 </script>
 
 <template>
-    <div class="warp">
-        <div class="uiverse" v-loading="loading">
-            <div class="tools">
-              <div class="circle">
-                <span class="box bg-red-500"></span>
-              </div>
-              <div class="circle">
-                <span class="box bg-yellow-500"></span>
-              </div>
-              <div class="circle">
-                <span class="box bg-blue-500"></span>
-              </div>
-            </div>
-            <p class="text-center text-4xl py-4 font-bold">湖南工业学院校内超市商品分类信息</p>
+    <div class="warp" v-loading="loading">
+        <table-layout tableTitle="湖南工业学院校内超市商品分类信息">
             <el-table border  :data="tableData" @sort-change="sortChange" header-row-class-name="text-black">
                 <el-table-column prop="id" label="编号" sortable="custom"/>
                 <el-table-column prop="name" label="分类名称" sortable="custom"/>
@@ -112,21 +102,21 @@ const submitForm = async () => {
             <div class="flex justify-center py-4">
                 <el-button size="large" type="success" @click="handleAdd">添加</el-button>
             </div>
-            <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="30%">
-                <el-form :model="editInfo" label-position="top">
-                    <el-form-item label="分类名称" label-width="auto">
-                        <el-input v-model="editInfo.name" autocomplete="off" />
-                    </el-form-item>
-                    <el-form-item label="推荐指数" label-width="auto">
-                        <el-input v-model="editInfo.recommend" autocomplete="off" />
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button size="large" type="primary" @click="submitForm()">提交</el-button>
-                        <el-button size="large" @click="dialogFormVisible = false">取消</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-dialog>
-        </div>
+        </table-layout>
+        <el-dialog v-model="dialogFormVisible" draggable :title="cur" width="30%">
+            <el-form :model="editInfo" label-position="top">
+                <el-form-item label="分类名称" label-width="auto">
+                    <el-input v-model="editInfo.name" autocomplete="off" />
+                </el-form-item>
+                <el-form-item label="推荐指数" label-width="auto">
+                    <el-input v-model="editInfo.recommend" autocomplete="off" />
+                </el-form-item>
+                <el-form-item>
+                    <el-button size="large" type="primary" @click="submitForm()">提交</el-button>
+                    <el-button size="large" @click="dialogFormVisible = false">取消</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     </div>
 </template>
 
