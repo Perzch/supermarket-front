@@ -120,24 +120,32 @@ onMounted(async () => {
                 </el-form-item>
             </el-form>
             <el-table border  :data="tableData.content" @sort-change="sortChange" header-row-class-name="text-black" table-layout="auto">
-                <el-table-column prop="id" label="编号" sortable="custom"/>
-                <el-table-column prop="product.id" label="商品编号" sortable="custom"/>
-                <el-table-column prop="product.name" label="商品名称" sortable="custom"/>
-                <el-table-column prop="product.categoryName" label="所属分类" sortable="custom"/>
-                <el-table-column prop="product.price" label="进价" sortable="custom"/>
-                <el-table-column prop="product.nowPrice" label="售价" sortable="custom"/>
-                <el-table-column prop="saleCount" label="销量" sortable="custom"/>
-                <el-table-column label="销售额">
+                <el-table-column prop="id" label="编号" sortable="custom" width="100"/>
+                <el-table-column prop="product.id" label="商品编号" sortable="custom" width="120"/>
+                <el-table-column prop="product.name" label="商品名称" sortable="custom" width="120"/>
+                <el-table-column prop="product.categoryName" label="所属分类" sortable="custom" width="120"/>
+                <el-table-column label="进价" sortable="custom" width="100">
                     <template #default="scope">
-                        <span>{{ scope.row.product.nowPrice * scope.row.saleCount }}</span>
+                        <span>￥{{ scope.row.product.price.toFixed(2) }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="净利润">
+                <el-table-column label="售价" sortable="custom" width="100">
                     <template #default="scope">
-                        <span>{{ (scope.row.product.nowPrice - scope.row.product.price) * scope.row.saleCount }}</span>
+                        <span>￥{{ scope.row.product.nowPrice.toFixed(2) }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="createDate" label="创建时间" sortable="custom"/>
+                <el-table-column prop="saleCount" label="销量" sortable="custom" width="100"/>
+                <el-table-column label="销售额" width="100">
+                    <template #default="scope">
+                        <span>￥{{ (scope.row.product.nowPrice * scope.row.saleCount).toFixed(2) }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="净利润" width="100">
+                    <template #default="scope">
+                        <span>￥{{ ((scope.row.product.nowPrice - scope.row.product.price) * scope.row.saleCount).toFixed(2) }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="createDate" label="创建时间" sortable="custom" width="120"/>
             </el-table>
             <div class="flex justify-between p-2">
                 <p class="w-fit text-sm text-gray-500">共{{ tableData.totalElements }}条数据</p>
