@@ -1,11 +1,17 @@
 <script setup>
 import {ref,onMounted} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute,useRouter} from "vue-router";
 import { useAuthStore } from 'store';
 const route = useRoute()
+const router = useRouter()
 const store = useAuthStore()
 
 const activeIndex = ref(route.path)
+
+const exit = () => {
+    if(store.exit) router.push('/auth')
+}
+
 onMounted(() => {
     let username = localStorage.getItem('username');
     if(username && !store.username) {
@@ -28,7 +34,7 @@ onMounted(() => {
         <el-menu-item index="/sale">销售统计</el-menu-item>
         <div class="flex-grow" />
         <el-menu-item>
-            <el-dropdown class="justify-center items-center" @command="store.exit">
+            <el-dropdown class="justify-center items-center" @command="exit">
                 <div>你好！{{store.username}}</div>
                 <template #dropdown>
                     <el-dropdown-menu>

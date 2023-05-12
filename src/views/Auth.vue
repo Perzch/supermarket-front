@@ -2,6 +2,7 @@
 import {reactive, ref, onUnmounted} from 'vue';
 import {useAuthStore} from "store";
 import {useRouter} from "vue-router";
+import JSEncrypt from 'jsencrypt'
 const router = useRouter()
 const authStore = useAuthStore()
 const user = reactive({
@@ -24,17 +25,31 @@ const validatePassword = () => {
     error.password = user.password.trim().length < 6 || user.password.trim().length > 18;
 }
 const validateCaptcha = () => {
-    error.captcha = !user.captcha.trim();
+    error.captcha = user.captcha.trim() === '';
 }
 // 登录方法
 const login = async () => {
     validateUsername()
     validatePassword()
     validateCaptcha()
-    if (error.username || error.password) {
+    if (error.username || error.password || error.captcha) {
         return
     }
-    if(await authStore.login({...user})) await router.push('/')
+    if(await authStore.login({
+        username: user.username,
+        password: goEncrypt(user.password),
+        captcha: user.captcha
+    })) await router.push('/')
+}
+const goEncrypt = (data) =>{
+        const encryptor = new JSEncrypt()
+        // 之前生成的公钥
+        const publicKey =
+        `-----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmUYcJJ33776uoIuCOL9NMzNfCLTsygg14uEABbbiQBgw0yRP24kgvdvJh8lc+xkglRDKcirjjIc3FB06nOoAKbfitDi+jG4tbM5VBVAsB+83tIpX2wFnQimFB1TD2ByUIP9YQOBZIKiLOjpHle7IQr53t+cOW3mQWADvMAbqIHQIDAQAB
+        -----END PUBLIC KEY-----`
+        encryptor.setPublicKey(publicKey)
+        return encryptor.encrypt(data)
 }
 const windowKeyDown = (e) => {
     if (e.keyCode === 13) {

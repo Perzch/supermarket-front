@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import { api,request } from 'request'
-import { ElNotification } from "element-plus";
+import { ElNotification,ElMessageBox } from "element-plus";
 export const useAuthStore = defineStore('auth',() => {
     const username = ref('')
     const token = ref('')
@@ -17,6 +17,7 @@ export const useAuthStore = defineStore('auth',() => {
             localStorage.removeItem('token')
             localStorage.removeItem('username')
             ElNotification.success("退出成功")
+            return true
         })
     }
 
