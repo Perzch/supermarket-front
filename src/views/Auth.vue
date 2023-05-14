@@ -35,11 +35,11 @@ const login = async () => {
     if (error.username || error.password || error.captcha) {
         return
     }
-    if(await authStore.login({
+    await authStore.login({
         username: user.username,
         password: goEncrypt(user.password),
         captcha: user.captcha
-    })) await router.push('/')
+    },router)
 }
 const goEncrypt = (data) =>{
         const encryptor = new JSEncrypt()

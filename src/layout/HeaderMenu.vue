@@ -8,9 +8,6 @@ const store = useAuthStore()
 
 const activeIndex = ref(route.path)
 
-const exit = () => {
-    if(store.exit) router.push('/auth')
-}
 
 onMounted(() => {
     let username = localStorage.getItem('username');
@@ -34,7 +31,7 @@ onMounted(() => {
         <el-menu-item index="/sale">销售统计</el-menu-item>
         <div class="flex-grow" />
         <el-menu-item>
-            <el-dropdown class="justify-center items-center" @command="exit">
+            <el-dropdown class="justify-center items-center" @command="store.exit(router)">
                 <div>你好！{{store.username}}</div>
                 <template #dropdown>
                     <el-dropdown-menu>
@@ -49,13 +46,13 @@ onMounted(() => {
 <style scoped lang="scss">
 .menu {
     mask: linear-gradient(to left, transparent 0%, black 20%);
-    @apply backdrop-blur-md bg-white bg-opacity-0 text-black border-0;
+    @apply backdrop-blur-md bg-white bg-opacity-0 text-white border-0;
     // @apply after:w-full after:h-full after:absolute after:top-0 after:backdrop-blur-md after:-z-1;
     :deep(.el-menu-item),:deep(.el-tooltip__trigger) {
-        @apply text-gray-800;
+        @apply text-gray-700;
     }
     :deep(.is-active){
-        @apply text-black bg-gray-200 bg-opacity-70;
+        @apply text-white bg-gray-200 bg-opacity-70;
     }
 }
 </style>
