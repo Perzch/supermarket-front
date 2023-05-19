@@ -1,13 +1,13 @@
-<script setup>
-import { ref,onMounted,computed } from 'vue';
-import {api,request} from 'request';
-import TableLayout from 'components/TableLayout.vue';
+<script lang="ts" setup>
+import { ref,onMounted,computed, type Ref } from 'vue';
+import {api,request} from '@/request';
+import TableLayout from '@/components/TableLayout.vue';
 import { ElNotification } from 'element-plus';
 
 const productIds = ref([])
 const productNames = ref([])
 const buyCount = ref(0) //购买数量
-const product = ref({}) //商品信息
+const product:Ref = ref({}) //商品信息
 const amount = ref(0) //实收金额
 const amountPayable = computed(() => { //支付金额
     return product.value.nowPrice?product.value.nowPrice * buyCount.value:0
@@ -17,7 +17,7 @@ const giveChange = computed(() => { //找零
 })
 const loading = ref(false)
 
-const getProductInfo = async (val, column) => {
+const getProductInfo = async (val:number, column:string) => {
     const res = (await request({
         url: api.product + (column === 'id'?'/':'/name/') + val,
         method: 'get'
@@ -76,7 +76,7 @@ onMounted(async () => {
         <table-layout tableTitle="湖南工业学院校内超市收银台">
             <el-form label-position="top" class="data-form" size="large" :inline="true">
                 <el-form-item label="商品编号:" class="items-center">
-                    <el-select v-model="product.id" filterable placeholder="Select" clearable @change="val => getProductInfo(val,'id')">
+                    <el-select v-model="product.id" filterable placeholder="Select" clearable @change="(val:number) => getProductInfo(val,'id')">
                         <el-option
                         v-for="item in productIds"
                         :key="item"
@@ -86,7 +86,7 @@ onMounted(async () => {
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品名称:" class="items-center">
-                    <el-select v-model="product.name" filterable placeholder="Select" clearable @change="val => getProductInfo(val,'name')">
+                    <el-select v-model="product.name" filterable placeholder="Select" clearable @change="(val:number) => getProductInfo(val,'name')">
                         <el-option
                         v-for="item in productNames"
                         :key="item"

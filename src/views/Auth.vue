@@ -1,11 +1,12 @@
-<script setup>
+<script lang="ts" setup>
 import {reactive, ref, onUnmounted} from 'vue';
-import {useAuthStore} from "store";
+import {useAuthStore} from "@/store";
 import {useRouter} from "vue-router";
 import JSEncrypt from 'jsencrypt'
+import type { User } from '@/interface';
 const router = useRouter()
 const authStore = useAuthStore()
-const user = reactive({
+const user:User = reactive({
     username: '',
     password: '',
     captcha: ''
@@ -41,7 +42,7 @@ const login = async () => {
         captcha: user.captcha
     },router)
 }
-const goEncrypt = (data) =>{
+const goEncrypt = (data:string) :string =>{
         const encryptor = new JSEncrypt()
         // 之前生成的公钥
         const publicKey =
@@ -49,9 +50,9 @@ const goEncrypt = (data) =>{
         MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmUYcJJ33776uoIuCOL9NMzNfCLTsygg14uEABbbiQBgw0yRP24kgvdvJh8lc+xkglRDKcirjjIc3FB06nOoAKbfitDi+jG4tbM5VBVAsB+83tIpX2wFnQimFB1TD2ByUIP9YQOBZIKiLOjpHle7IQr53t+cOW3mQWADvMAbqIHQIDAQAB
         -----END PUBLIC KEY-----`
         encryptor.setPublicKey(publicKey)
-        return encryptor.encrypt(data)
+        return encryptor.encrypt(data).toString()
 }
-const windowKeyDown = (e) => {
+const windowKeyDown = (e:KeyboardEvent) => {
     if (e.keyCode === 13) {
         login()
     }

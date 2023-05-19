@@ -1,6 +1,6 @@
-import axios from "axios"
+import axios, { type AxiosInstance } from "axios"
 
-const service = axios.create({
+const service:AxiosInstance = axios.create({
     baseURL: "/api",
     timeout: 50000,
     method: 'post',

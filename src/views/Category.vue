@@ -1,15 +1,15 @@
-<script setup>
-import {ref,onMounted} from "vue";
-import { api, request } from 'request'
+<script lang="ts" setup>
+import {ref,onMounted, type Ref} from "vue";
+import { api, request } from '@/request'
 import { ElMessageBox, ElNotification } from "element-plus";
-import TableLayout from 'components/TableLayout.vue'
-
-const tableData = ref([])
-const editInfo = ref({})
+import TableLayout from '@/components/TableLayout.vue'
+import { type Category } from '@/interface'
+const tableData:Ref<Array<Category>> = ref([])
+const editInfo:Ref = ref({})
 const cur = ref('')
 const dialogFormVisible = ref(false)
 const loading = ref(true)
-const getData = async (config) => {
+const getData = async (config:any) => {
     loading.value = true
     const res = await request({
         url: api.category,
@@ -23,17 +23,17 @@ onMounted( async () => {
         method: 'get'
     })
 })
-const sortChange = (column) => {
-    if(!column.order) return
+const sortChange = (config:{column:string,prop:string,order:string}) => {
+    if(!config.order) return
     getData({
         method: 'get',
         params: {
-            sortColumn: column.prop,
-            sort: column.order === 'ascending' ? 'asc' : 'desc'
+            sortColumn: config.prop,
+            sort: config.order === 'ascending' ? 'asc' : 'desc'
         }
     })
 }
-const handleEdit = (index, row) => {
+const handleEdit = (index:number, row:string) => {
     cur.value = '修改分类'
     editInfo.value = {...tableData.value[index]}
     dialogFormVisible.value = true
@@ -43,7 +43,7 @@ const handleAdd = () => {
     editInfo.value = {}
     dialogFormVisible.value = true
 }
-const handleDelete = (index, row) => {
+const handleDelete = (index:number, row:{id:number}) => {
     ElMessageBox.confirm('此操作将永久删除该分类, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

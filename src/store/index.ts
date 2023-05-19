@@ -1,12 +1,14 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import { api,request } from 'request'
+import { api,request } from '@/request'
 import { ElNotification,ElMessageBox } from "element-plus";
+import type { Router } from "vue-router";
+import type { User } from "@/interface";
 export const useAuthStore = defineStore('auth',() => {
     const username = ref('')
     const token = ref('')
 
-    const exit = (router) => {
+    const exit = (router:Router) => {
         ElMessageBox.confirm('确认退出吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -21,7 +23,7 @@ export const useAuthStore = defineStore('auth',() => {
         })
     }
 
-    const login = async (user,router) => {
+    const login = async (user:User,router:Router) => {
         const res = await request({
             url: api.login,
             method: 'post',

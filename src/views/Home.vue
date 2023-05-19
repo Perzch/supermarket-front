@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import HeaderMenu from "@/layout/HeaderMenu.vue";
 </script>
 <template>

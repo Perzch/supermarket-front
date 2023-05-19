@@ -1,5 +1,8 @@
 
-export const api = {
+interface Api {
+    [key: string]: string
+}
+export const api:Api = {
     category: 'category',
     categoryNames: 'category/names',
     login: 'auth',

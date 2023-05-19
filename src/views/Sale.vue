@@ -1,11 +1,11 @@
-<script setup>
-import { computed, onMounted, ref, watchEffect } from 'vue';
-import { api, request } from 'request'
-import { ElNotification,ElMessageBox } from 'element-plus';
-import TableLayout from 'components/TableLayout.vue';
+<script lang="ts" setup>
+import { computed, onMounted, ref, watchEffect, type Ref } from 'vue';
+import { api, request } from '@/request'
+import { ElNotification } from 'element-plus';
+import TableLayout from '@/components/TableLayout.vue';
 
-const tableData = ref([])
-const queryData = ref({
+const tableData:Ref = ref([])
+const queryData:Ref = ref({
     categoryName: undefined,
     startYieldDate: '',
     endYieldDate: ''
@@ -36,7 +36,7 @@ watchEffect(() => {
 
 const getData = async () => {
     loading.value = true
-    const params = {
+    const params:any = {
         page: page.value
     }
     // 如果有排序列
@@ -59,10 +59,10 @@ const getData = async () => {
     }
     loading.value = false
 }
-const sortChange = async column => {
-    sort.value = column.order
-    sortColumn.value = column.prop
-    if(!column.order) return
+const sortChange = async (config:{column:string,prop:string,order:string}) => {
+    sort.value = config.order
+    sortColumn.value = config.prop
+    if(!config.order) return
     getData()
 }
 const downloadAllData = () => {

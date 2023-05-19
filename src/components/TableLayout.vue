@@ -1,5 +1,7 @@
-<script setup>
-defineProps(['tableTitle'])
+<script lang="ts" setup>
+defineProps<{
+    tableTitle: string
+}>()
 </script>
 <template>
     <div class="uiverse">

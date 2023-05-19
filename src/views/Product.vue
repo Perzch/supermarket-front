@@ -1,14 +1,14 @@
-<script setup>
-import { computed, onMounted, ref, watchEffect } from 'vue';
-import { api, request } from 'request'
+<script lang="ts" setup>
+import { computed, onMounted, ref, watchEffect, type Ref } from 'vue';
+import { api, request } from '@/request'
 import { ElNotification,ElMessageBox } from 'element-plus';
-import TableLayout from 'components/TableLayout.vue';
+import TableLayout from '@/components/TableLayout.vue';
 
-const tableData = ref([])
-const editInfo = ref({
+const tableData:Ref = ref([])
+const editInfo:Ref = ref({
 })
 const cur = ref('')
-const queryData = ref({
+const queryData:Ref = ref({
     name: undefined,
     categoryName: undefined,
     startYieldDate: '',
@@ -41,8 +41,8 @@ watchEffect(() => {
 
 const getData = async () => {
     loading.value = true
-    const params = {
-        page: page.value
+    const params:any = {
+        page: page.value,
     }
     // 如果有排序列
     if(sortColumn.value) params.sortColumn = sortColumn.value
@@ -65,13 +65,13 @@ const getData = async () => {
     loading.value = false
 }
 
-const sortChange = async column => {
-    sort.value = column.order
-    sortColumn.value = column.prop
-    if(!column.order) return
+const sortChange = async (config:{column:string,prop:string,order:string}) => {
+    sort.value = config.order
+    sortColumn.value = config.prop
+    if(!config.order) return
     getData()
 }
-const handleEdit = (index, row) => {
+const handleEdit = (index:number, row:any) => {
     cur.value = '修改商品库存信息'
     editInfo.value = {...tableData.value.content[index]}
     dialogFormVisible.value = true
@@ -81,14 +81,14 @@ const handleAdd = () => {
     editInfo.value = {}
     dialogFormVisible.value = true
 }
-const handleAddCount = (index,row) => {
+const handleAddCount = (index:number, row:any) => {
     loading.value = true
     ElMessageBox.prompt('请输入需要增加的库存数量', '增加库存', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         inputPattern: /^\d+$/,
         inputErrorMessage: '请输入正整数',
-    }).then(async ({value}) => {
+    }).then(async ({value}:{value:any}) => {
         row.stock += Number(value);
         const res = (await request({
             url: api.product,
@@ -104,7 +104,7 @@ const handleAddCount = (index,row) => {
     })
     loading.value = false
 }
-const handleDelete = (index, row) => {
+const handleDelete = (index:number, row:any) => {
     ElMessageBox.confirm('此操作将永久删除该商品, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

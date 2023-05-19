@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -13,34 +13,34 @@ const router = createRouter({
         {
           path: '/cashier',
           name: 'cashier',
-          component: () => import('views/Cashier.vue')
+          component: () => import('../views/Cashier.vue')
         },
         {
           path: '/category',
           name: 'category',
-          component: () => import('views/Category.vue')
+          component: () => import('../views/Category.vue')
         },
         {
           path: '/product',
           name: 'product',
-          component: () => import('views/Product.vue')
+          component: () => import('../views/Product.vue')
         },
         {
           path: '/sale',
           name: 'sale',
-          component: () => import('views/Sale.vue')
+          component: () => import('../views/Sale.vue')
         }
       ]
     },
     {
       path: '/auth',
       name: 'auth',
-      component: () => import('views/Auth.vue')
+      component: () => import('../views/Auth.vue')
     },
   ]
 })
 
-router.beforeEach((to,form) => {
+router.beforeEach((to,form):object|undefined => {
   if (
       // 检查用户是否已登录
       !localStorage.getItem('token') &&

@@ -1,9 +1,9 @@
-<script setup>
+<script lang="ts" setup>
 import {ref,onMounted} from "vue";
-import {useRoute,useRouter} from "vue-router";
-import { useAuthStore } from 'store';
+import {useRoute,useRouter, type Router, type RouteLocationNormalizedLoaded} from "vue-router";
+import { useAuthStore } from '../store';
 const route = useRoute()
-const router = useRouter()
+const router:Router = useRouter()
 const store = useAuthStore()
 
 const activeIndex = ref(route.path)
