@@ -1,60 +1,43 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watchEffect, type Ref } from 'vue';
 import { api, request } from '@/request'
+import type { ProductDto,PageAble } from '@/interface';
 import { ElNotification,ElMessageBox } from 'element-plus';
 import TableLayout from '@/components/TableLayout.vue';
 
 const tableData:Ref = ref([])
-const editInfo:Ref = ref({
-})
+const editInfo:Ref = ref({})
 const cur = ref('')
-const queryData:Ref = ref({
+const queryData:Ref<ProductDto> = ref({
     name: undefined,
     categoryName: undefined,
     startYieldDate: '',
     endYieldDate: ''
 })
-const yieldDateArray = ref([])
-const sort = ref('')
-const sortColumn = ref('')
-const page = ref(0)
+const pageAble:Ref<PageAble> = ref({
+    page: 0,
+    limit: 10
+})
 const loading = ref(false)
 const dialogFormVisible = ref(false)
 const categoryNames = ref([])
 const pageComputed = computed({
-    get: () => page.value +1,
+    get: () => pageAble.value.page +1,
     set: val => {
-        page.value = val -1
+        pageAble.value.page = val -1
         getData()
     }
 })
 
-watchEffect(() => {
-    if(!yieldDateArray.value) {
-        queryData.value.startYieldDate = undefined;
-        queryData.value.endYieldDate = undefined;
-        return
-    }
-    queryData.value.startYieldDate = yieldDateArray.value[0];
-    queryData.value.endYieldDate = yieldDateArray.value[1];
-})
-
-const getData = async () => {
+const getData:Function = async () => {
     loading.value = true
-    const params:any = {
-        page: page.value,
-    }
-    // 如果有排序列
-    if(sortColumn.value) params.sortColumn = sortColumn.value
-    // 如果有排序方向
-    if(sort.value) params.sort = sort.value === 'ascending' ? 'asc' : 'desc'
     // 返回响应体body
     const res = ((await request({
         url: api.product,
         method: 'get',
         params: {
             ...queryData.value,
-            ...params
+            ...pageAble.value
         }
     })).data)
     if(res.code === 200) {
@@ -64,24 +47,23 @@ const getData = async () => {
     }
     loading.value = false
 }
-
-const sortChange = async (config:{column:string,prop:string,order:string}) => {
-    sort.value = config.order
-    sortColumn.value = config.prop
+const sortChange:Function = async (config:{column:string,prop:string,order:string}) => {
+    pageAble.value.sort = config.order === 'ascending' ? 'asc' : 'desc'
+    pageAble.value.sortColumn = config.prop
     if(!config.order) return
     getData()
 }
-const handleEdit = (index:number, row:any) => {
+const handleEdit:Function = (index:number, row:any) => {
     cur.value = '修改商品库存信息'
     editInfo.value = {...tableData.value.content[index]}
     dialogFormVisible.value = true
 }
-const handleAdd = () => {
+const handleAdd:Function = () => {
     cur.value = '添加商品'
     editInfo.value = {}
     dialogFormVisible.value = true
 }
-const handleAddCount = (index:number, row:any) => {
+const handleAddCount:Function = (index:number, row:any) => {
     loading.value = true
     ElMessageBox.prompt('请输入需要增加的库存数量', '增加库存', {
         confirmButtonText: '确认',
@@ -104,7 +86,7 @@ const handleAddCount = (index:number, row:any) => {
     })
     loading.value = false
 }
-const handleDelete = (index:number, row:any) => {
+const handleDelete:Function = (index:number, row:any) => {
     ElMessageBox.confirm('此操作将永久删除该商品, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -122,7 +104,7 @@ const handleDelete = (index:number, row:any) => {
         loading.value = false
     })
 }
-const submitForm = async () => {
+const submitForm:Function = async () => {
     loading.value = true
     const config = {
         method: cur.value === '添加商品' ? 'post' : 'put',
@@ -151,7 +133,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="warp" v-loading="loading">
+    <div class="warp" v-loading.fullscreen.lock="loading">
         <table-layout tableTitle="湖南工业学院校内超市商品库存信息">
             <el-form label-position="left" class="flex justify-around gap-4" size="large">
                 <el-form-item label="商品名称:" class="items-center">
@@ -169,14 +151,20 @@ onMounted(async () => {
                 </el-form-item>
                 <el-form-item label="生产时间由:" class="items-center">
                     <el-date-picker
-                        v-model="yieldDateArray"
-                        type="daterange"
-                        range-separator="到"
-                        start-placeholder="年-月-日"
-                        end-placeholder="年-月-日"
+                        v-model="queryData.startYieldDate"
+                        type="date"
+                        placeholder="年-月-日"
                         format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD"
                     />
+                    <span class="mx-2">到</span>
+                    <el-date-picker
+                            v-model="queryData.endYieldDate"
+                            type="date"
+                            placeholder="年-月-日"
+                            format="YYYY-MM-DD"
+                            value-format="YYYY-MM-DD"
+                        />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getData">查询</el-button>

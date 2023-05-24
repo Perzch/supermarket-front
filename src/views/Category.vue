@@ -3,13 +3,13 @@ import {ref,onMounted, type Ref} from "vue";
 import { api, request } from '@/request'
 import { ElMessageBox, ElNotification } from "element-plus";
 import TableLayout from '@/components/TableLayout.vue'
-import { type Category } from '@/interface'
+import type { Category } from '@/interface'
 const tableData:Ref<Array<Category>> = ref([])
 const editInfo:Ref = ref({})
 const cur = ref('')
 const dialogFormVisible = ref(false)
 const loading = ref(true)
-const getData = async (config:any) => {
+const getData:Function = async (config:any) => {
     loading.value = true
     const res = await request({
         url: api.category,
@@ -18,12 +18,12 @@ const getData = async (config:any) => {
     tableData.value = res.data.data
     loading.value = false
 }
-onMounted( async () => {
+onMounted(async () => {
     getData({
         method: 'get'
     })
 })
-const sortChange = (config:{column:string,prop:string,order:string}) => {
+const sortChange:Function = (config:{column:string,prop:string,order:string}) => {
     if(!config.order) return
     getData({
         method: 'get',
@@ -33,17 +33,17 @@ const sortChange = (config:{column:string,prop:string,order:string}) => {
         }
     })
 }
-const handleEdit = (index:number, row:string) => {
+const handleEdit:Function = (index:number, row:string) => {
     cur.value = '修改分类'
     editInfo.value = {...tableData.value[index]}
     dialogFormVisible.value = true
 }
-const handleAdd = () => {
+const handleAdd:Function = () => {
     cur.value = '添加分类'
     editInfo.value = {}
     dialogFormVisible.value = true
 }
-const handleDelete = (index:number, row:{id:number}) => {
+const handleDelete:Function = (index:number, row:{id:number}) => {
     ElMessageBox.confirm('此操作将永久删除该分类, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -63,7 +63,7 @@ const handleDelete = (index:number, row:{id:number}) => {
         loading.value = false
     })
 }
-const submitForm = async () => {
+const submitForm:Function = async () => {
     loading.value = true
     const config = {
         method: cur.value === '添加分类'?'post':'put',
@@ -86,7 +86,7 @@ const submitForm = async () => {
 </script>
 
 <template>
-    <div class="warp" v-loading="loading">
+    <div class="warp" v-loading.fullscreen.lock="loading">
         <table-layout tableTitle="湖南工业学院校内超市商品分类信息">
             <div class="flex justify-end py-4">
                 <el-button size="large" type="success" @click="handleAdd">添加</el-button>

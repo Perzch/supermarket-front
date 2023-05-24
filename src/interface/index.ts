@@ -27,3 +27,23 @@ export type Sale = {
     createDate: string,
     product: Product
 }
+
+export type ProductDto = {
+    name: string | undefined,
+    categoryName: string | undefined,
+    startYieldDate: string | undefined,
+    endYieldDate: string | undefined,
+}
+
+export type SaleDto = {
+    categoryName: string | undefined,
+    startCreateDate: string | undefined,
+    endCreateDate: string | undefined
+}
+
+export type PageAble = {
+    page: number,
+    limit: number | undefined,
+    sort: string | undefined,
+    sortColumn: string | undefined
+} | any

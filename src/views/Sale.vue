@@ -3,53 +3,37 @@ import { computed, onMounted, ref, watchEffect, type Ref } from 'vue';
 import { api, request } from '@/request'
 import { ElNotification } from 'element-plus';
 import TableLayout from '@/components/TableLayout.vue';
+import type { PageAble, SaleDto } from '@/interface';
 
 const tableData:Ref = ref([])
-const queryData:Ref = ref({
+const queryData:Ref<SaleDto> = ref({
     categoryName: undefined,
-    startYieldDate: '',
-    endYieldDate: ''
+    startCreateDate: '',
+    endCreateDate: ''
+})
+const pageAble:Ref<PageAble> = ref({
+    page: 0,
+    limit: 10
 })
 const categoryNames = ref([])
-const yieldDateArray = ref([])
-const sort = ref('')
-const sortColumn = ref('')
-const page = ref(0)
 const loading = ref(false)
 const pageComputed = computed({
-    get: () => page.value +1,
+    get: () => pageAble.value.page +1,
     set: val => {
-        page.value = val -1
+        pageAble.value.page = val -1
         getData()
     }
 })
 
-watchEffect(() => {
-    if(!yieldDateArray.value) {
-        queryData.value.startYieldDate = undefined;
-        queryData.value.endYieldDate = undefined;
-        return
-    }
-    queryData.value.startYieldDate = yieldDateArray.value[0];
-    queryData.value.endYieldDate = yieldDateArray.value[1];
-})
-
-const getData = async () => {
+const getData:Function = async () => {
     loading.value = true
-    const params:any = {
-        page: page.value
-    }
-    // 如果有排序列
-    if(sortColumn.value) params.sortColumn = sortColumn.value
-    // 如果有排序方向
-    if(sort.value) params.sort = sort.value === 'ascending' ? 'asc' : 'desc'
     // 返回响应体body
     const res = ((await request({
         url: api.sale,
         method: 'get',
         params: {
             ...queryData.value,
-            ...params
+            ...pageAble.value
         }
     })).data)
     if(res.code === 200) {
@@ -59,18 +43,19 @@ const getData = async () => {
     }
     loading.value = false
 }
-const sortChange = async (config:{column:string,prop:string,order:string}) => {
-    sort.value = config.order
-    sortColumn.value = config.prop
+const sortChange:Function = async (config:{column:string,prop:string,order:string}) => {
+    pageAble.value.sort = config.order === 'ascending' ? 'asc' : 'desc'
+    pageAble.value.sortColumn = config.prop
     if(!config.order) return
     getData()
 }
-const downloadAllData = () => {
+const downloadAllData:Function = () => {
     request({
         url: api.printSales,
         method: 'get',
         responseType: 'blob'
     }).then(res => {
+        // 打开新窗口下载
         const url = URL.createObjectURL(res.data)
         window.open(url)
         URL.revokeObjectURL(url)
@@ -90,11 +75,11 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="warp" v-loading="loading">
+    <div class="warp" v-loading.fullscreen.lock="loading">
         <table-layout tableTitle="湖南工业学院校内超市商品销售记录">
-            <el-form label-position="left" class="flex gap-4 justify-around">
+            <el-form label-position="left" size="large" class="flex gap-4 justify-around">
                 <el-form-item label="商品类别:" class="items-center">
-                    <el-select v-model="queryData.categoryName" filterable placeholder="Select" size="large" clearable >
+                    <el-select v-model="queryData.categoryName" filterable placeholder="Select" clearable >
                         <el-option
                         v-for="item in categoryNames"
                         :key="item"
@@ -105,15 +90,20 @@ onMounted(async () => {
                 </el-form-item>
                 <el-form-item label="时间由:" class="items-center">
                     <el-date-picker
-                        v-model="yieldDateArray"
-                        type="daterange"
-                        range-separator="到"
-                        start-placeholder="年-月-日"
-                        end-placeholder="年-月-日"
-                        format="YYYY-MM-DD"
-                        value-format="YYYY-MM-DD"
-                        size="large"
-                    />
+                            v-model="queryData.startCreateDate"
+                            type="date"
+                            placeholder="年-月-日"
+                            format="YYYY-MM-DD"
+                            value-format="YYYY-MM-DD"
+                        />
+                        <span class="mx-2">到</span>
+                        <el-date-picker
+                                v-model="queryData.endCreateDate"
+                                type="date"
+                                placeholder="年-月-日"
+                                format="YYYY-MM-DD"
+                                value-format="YYYY-MM-DD"
+                            />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getData">查询</el-button>

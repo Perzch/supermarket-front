@@ -36,7 +36,10 @@ export const useAuthStore = defineStore('auth',() => {
             token.value = res.data.data
             ElNotification.success("登录成功")
             router.push("/")
-        } else ElNotification.error(res.data.message)
+        } else {
+            ElNotification.error(res.data.message)
+            throw new Error(res.data.message)
+        }
     }
     return {
         username,token,exit,login

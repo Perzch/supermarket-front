@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import { ref,onMounted,computed, type Ref } from 'vue';
+import { ref,onMounted,computed, type Ref, type ComputedRef } from 'vue';
 import {api,request} from '@/request';
 import TableLayout from '@/components/TableLayout.vue';
 import { ElNotification } from 'element-plus';
 
-const productIds = ref([])
-const productNames = ref([])
-const buyCount = ref(0) //购买数量
+const productIds:Ref = ref([])
+const productNames:Ref = ref([])
+const buyCount:Ref = ref(0) //购买数量
 const product:Ref = ref({}) //商品信息
-const amount = ref(0) //实收金额
-const amountPayable = computed(() => { //支付金额
+const amount:Ref = ref(0) //实收金额
+const loading = ref(false)
+const amountPayable:ComputedRef = computed(() => { //支付金额
     return product.value.nowPrice?product.value.nowPrice * buyCount.value:0
 })
-const giveChange = computed(() => { //找零
+const giveChange:ComputedRef = computed(() => { //找零
     return amountPayable.value?amount.value - amountPayable.value:0
 })
-const loading = ref(false)
 
-const getProductInfo = async (val:number, column:string) => {
+const getProductInfo:Function = async (val:number, column:string) => {
     const res = (await request({
         url: api.product + (column === 'id'?'/':'/name/') + val,
         method: 'get'
@@ -29,7 +29,7 @@ const getProductInfo = async (val:number, column:string) => {
     loading.value = false
 }
 
-const submit = async () => {
+const submit:Function = async () => {
     // 提交saleCount和pid
     const res = (await request({
         url: api.sale,

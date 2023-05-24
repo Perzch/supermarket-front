@@ -3,11 +3,11 @@ import HeaderMenu from "@/layout/HeaderMenu.vue";
 </script>
 <template>
   <div class="warp flex flex-col h-screen">
-    <el-header>
-      <div class="flex items-center gap-2 p-4">
-        <img src="../assets/Melly-Text.png" alt="logo" class="h-12" />
+    <!-- <el-header style="--el-header-padding: 0;">
+      <div class="flex items-center gap-2 h-full">
+        <h1 class="text-5xl text-white">超市收银系统</h1>
       </div>
-    </el-header>
+    </el-header> -->
     <div class="flex flex-1">
       <header-menu></header-menu>
       <router-view></router-view>
@@ -17,8 +17,8 @@ import HeaderMenu from "@/layout/HeaderMenu.vue";
 <style lang="scss" scoped>
   .warp{
     background: url('../assets/unnamed.png') center/cover no-repeat fixed;
-    img {
-      -webkit-user-drag: none;
+    h1 {
+      @apply p-2;
     }
   }
 </style>
