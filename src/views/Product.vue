@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watchEffect, type Ref } from 'vue';
 import { api, request } from '@/request'
 import type { ProductDto,PageAble } from '@/interface';
+import dayjs from 'dayjs'
 import { ElNotification,ElMessageBox } from 'element-plus';
 import TableLayout from '@/components/TableLayout.vue';
 
@@ -119,6 +120,14 @@ const submitForm:Function = async () => {
     } else ElNotification.warning(res.message)
     loading.value = false
 }
+const disabledEndDate:Function = (time:Date) => {
+    if (queryData.value.startYieldDate) return dayjs(time).isSameOrBefore(dayjs(queryData.value.startYieldDate))
+    else return false
+}
+const disabledStartDate:Function = (time:Date) => {
+    if (queryData.value.endYieldDate) return dayjs(time).isSameOrAfter(dayjs(queryData.value.endYieldDate))
+    else return false
+}
 onMounted(async () => {
     loading.value = true
     getData();
@@ -156,6 +165,7 @@ onMounted(async () => {
                         placeholder="年-月-日"
                         format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD"
+                        :disabled-date="disabledStartDate"
                     />
                     <span class="mx-2">到</span>
                     <el-date-picker
@@ -164,6 +174,7 @@ onMounted(async () => {
                             placeholder="年-月-日"
                             format="YYYY-MM-DD"
                             value-format="YYYY-MM-DD"
+                            :disabled-date="disabledEndDate"
                         />
                 </el-form-item>
                 <el-form-item>
@@ -177,10 +188,18 @@ onMounted(async () => {
                 <el-table-column prop="name" label="名称" sortable="custom"/>
                 <el-table-column prop="yieldDate" label="生产日期" sortable="custom"/>
                 <el-table-column prop="manufacturers" label="厂家" sortable="custom"/>
-                <el-table-column prop="price" label="进价" sortable="custom"/>
+                <el-table-column label="进价" sortable="custom">
+                    <template #default="scope">
+                        <span>￥{{ scope.row.price.toFixed(2) }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="createDate" label="进货日期" sortable="custom"/>
                 <el-table-column prop="stock" label="库存数" sortable="custom"/>
-                <el-table-column prop="nowPrice" label="售价" sortable="custom"/>
+                <el-table-column label="售价" sortable="custom">
+                    <template #default="scope">
+                        <span>￥{{ scope.row.nowPrice.toFixed(2) }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="saleCount" label="售出数" sortable="custom"/>
                 <el-table-column label="操作">
                     <template #default="scope">

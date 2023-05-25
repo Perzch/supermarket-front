@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watchEffect, type Ref } from 'vue';
 import { api, request } from '@/request'
 import { ElNotification } from 'element-plus';
+import dayjs from 'dayjs';
 import TableLayout from '@/components/TableLayout.vue';
 import type { PageAble, SaleDto } from '@/interface';
 
@@ -61,7 +62,14 @@ const downloadAllData:Function = () => {
         URL.revokeObjectURL(url)
     })
 }
-
+const disabledEndDate: Function = (time: Date) => {
+    if (queryData.value.startCreateDate) return dayjs(time).isSameOrBefore(dayjs(queryData.value.startCreateDate))
+    else return false
+}
+const disabledStartDate: Function = (time: Date) => {
+    if (queryData.value.endCreateDate) return dayjs(time).isSameOrAfter(dayjs(queryData.value.endCreateDate))
+    else return false
+}
 onMounted(async () => {
     loading.value = true
     getData();
@@ -95,6 +103,7 @@ onMounted(async () => {
                             placeholder="年-月-日"
                             format="YYYY-MM-DD"
                             value-format="YYYY-MM-DD"
+                            :disabled-date="disabledStartDate"
                         />
                         <span class="mx-2">到</span>
                         <el-date-picker
@@ -103,6 +112,7 @@ onMounted(async () => {
                                 placeholder="年-月-日"
                                 format="YYYY-MM-DD"
                                 value-format="YYYY-MM-DD"
+                                :disabled-date="disabledEndDate"
                             />
                 </el-form-item>
                 <el-form-item>
