@@ -6,6 +6,7 @@ import TableLayout from '@/components/TableLayout.vue'
 import type { Category } from '@/interface'
 const tableData:Ref<Array<Category>> = ref([])
 const editInfo:Ref = ref({})
+const editOld:Ref = ref({})
 const cur = ref('')
 const dialogFormVisible = ref(false)
 const loading = ref(true)
@@ -35,6 +36,7 @@ const sortChange:Function = (config:{column:string,prop:string,order:string}) =>
 }
 const handleEdit:Function = (index:number, row:string) => {
     cur.value = '修改分类'
+    editOld.value = {...tableData.value[index]}
     editInfo.value = {...tableData.value[index]}
     dialogFormVisible.value = true
 }
@@ -64,6 +66,9 @@ const handleDelete:Function = (index:number, row:{id:number}) => {
     })
 }
 const submitForm:Function = async () => {
+    if(cur.value !== '添加分类') {
+        return ElNotification.info('暂无改变')
+    }
     loading.value = true
     const config = {
         method: cur.value === '添加分类'?'post':'put',

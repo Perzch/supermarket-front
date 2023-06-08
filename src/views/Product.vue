@@ -8,6 +8,7 @@ import TableLayout from '@/components/TableLayout.vue';
 
 const tableData:Ref = ref([])
 const editInfo:Ref = ref({})
+const editOld:Ref = ref({})
 const cur = ref('')
 const queryData:Ref<ProductDto> = ref({
     name: undefined,
@@ -57,6 +58,7 @@ const sortChange:Function = async (config:{column:string,prop:string,order:strin
 const handleEdit:Function = (index:number, row:any) => {
     cur.value = '修改商品库存信息'
     editInfo.value = {...tableData.value.content[index]}
+    editOld.value = {...tableData.value.content[index]}
     dialogFormVisible.value = true
 }
 const handleAdd:Function = () => {
@@ -72,6 +74,7 @@ const handleAddCount:Function = (index:number, row:any) => {
         inputPattern: /^\d+$/,
         inputErrorMessage: '请输入正整数',
     }).then(async ({value}:{value:any}) => {
+        if(Number(value) <= 0) return ElNotification.info('暂无改变')
         row.stock += Number(value);
         const res = (await request({
             url: api.product,
@@ -106,6 +109,7 @@ const handleDelete:Function = (index:number, row:any) => {
     })
 }
 const submitForm:Function = async () => {
+    if(cur.value !== '添加商品') return ElNotification.info("暂无改变")
     loading.value = true
     const config = {
         method: cur.value === '添加商品' ? 'post' : 'put',

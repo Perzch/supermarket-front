@@ -1,19 +1,21 @@
 export type User = {
-    username: string;
-    password: string;
-    captcha: string;
+    username: string,
+    password: string,
+    captcha: string,
+    uuid: number
 }
-export type Product = {
-    categoryName: string,
-    createDate: string,
-    id:number,
-    manufacturers: string,
-    name: string,
-    nowPrice: number,
-    price: number,
-    saleCount: number,
-    stock: number,
-    yieldDate: string
+export interface Product {
+    categoryName: string;
+    createDate: string;
+    id:number;
+    manufacturers: string;
+    name: string;
+    nowPrice: number;
+    price: number;
+    saleCount: number;
+    stock: number;
+    yieldDate: string;
+    count: number;
 }
 export type Category = {
     id:number
@@ -40,7 +42,45 @@ export type SaleDto = {
     startCreateDate: string | undefined,
     endCreateDate: string | undefined
 }
-
+export type SaleData = 
+{
+  "id": number,
+  "createDate": string,
+  "products": Product[],
+  "saleProducts": 
+    {
+      "id": number,
+      "count": number
+    }[]
+}
+export type ResponseData<T> = {
+    "content": T,
+    "pageable": {
+      "sort": {
+        "empty": boolean,
+        "sorted": boolean,
+        "unsorted": boolean
+      },
+      "offset": number,
+      "pageNumber": number,
+      "pageSize": number,
+      "unpaged": number,
+      "paged": number
+    },
+    "last": number,
+    "totalPages": number,
+    "totalElements": number,
+    "size": number,
+    "number": number,
+    "sort": {
+      "empty": boolean,
+      "sorted": boolean,
+      "unsorted": boolean
+    },
+    "first": boolean,
+    "numberOfElements": number,
+    "empty": boolean
+} | {}
 export type PageAble = {
     page: number,
     limit: number | undefined,

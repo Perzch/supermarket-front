@@ -3,15 +3,28 @@ import { ref,onMounted,computed, type Ref, type ComputedRef } from 'vue';
 import {api,request} from '@/request';
 import TableLayout from '@/components/TableLayout.vue';
 import { ElNotification } from 'element-plus';
+import type { Product } from '@/interface';
 
 const productIds:Ref = ref([])
 const productNames:Ref = ref([])
-const buyCount:Ref = ref(0) //购买数量
-const product:Ref = ref({}) //商品信息
+const tableData:Ref<Product[]> = ref([])
+const product:Ref<Product> = ref({
+    categoryName: '',
+    createDate: '',
+    id: 0,
+    manufacturers: '',
+    name: '',
+    nowPrice: 0,
+    price: 0,
+    saleCount: 0,
+    stock: 0,
+    yieldDate: '',
+    count: 0
+}) //商品信息
 const amount:Ref = ref(0) //实收金额
 const loading = ref(false)
 const amountPayable:ComputedRef = computed(() => { //支付金额
-    return product.value.nowPrice?product.value.nowPrice * buyCount.value:0
+    return tableData.value.reduce((pre,cur) => pre + cur.nowPrice * cur.count, 0)
 })
 const giveChange:ComputedRef = computed(() => { //找零
     return amountPayable.value?amount.value - amountPayable.value:0
@@ -25,26 +38,68 @@ const getProductInfo:Function = async (val:number, column:string) => {
     loading.value = true
     if(res.code === 200) {
         product.value = res.data
+        product.value.count = 1
     } else ElNotification.error(res.message)
     loading.value = false
 }
 
+const addData:Function = async () => {
+    if(product.value.stock === 0) return ElNotification.error('请填写完整!')
+    if(product.value.stock < product.value.count) return ElNotification.error('库存不足!')
+    if(product.value?.count <= 0 || !product.value.name || product.value.id <= 0) return ElNotification.error('请填写完整!')
+    const data = tableData.value.find(item => item.id === product.value.id)
+    if(data) {
+        data.count += product.value.count
+    } else {
+        tableData.value.push(product.value)
+    }
+    product.value = {
+        categoryName: '',
+        createDate: '',
+        id: 0,
+        manufacturers: '',
+        name: '',
+        nowPrice: 0,
+        price: 0,
+        saleCount: 0,
+        stock: 0,
+        yieldDate: '',
+        count: 0
+    }
+}
+
 const submit:Function = async () => {
+    if(giveChange.value < 0) return ElNotification.error('实收金额不足!')
     // 提交saleCount和pid
     const res = (await request({
         url: api.sale,
         method: 'post',
         data: {
-            pid: product.value.id,
-            saleCount: buyCount.value
+            ids: tableData.value.map(item => {
+                return {
+                    id: item.id,
+                    count: item.count
+                }
+            })
         }
     })).data
-    console.log(res);
     if(res.code === 200) {
         ElNotification.success('提交成功!')
-        product.value = {}
-        buyCount.value = 0
+        product.value = {
+            categoryName: '',
+            createDate: '',
+            id: 0,
+            manufacturers: '',
+            name: '',
+            nowPrice: 0,
+            price: 0,
+            saleCount: 0,
+            stock: 0,
+            yieldDate: '',
+            count: 0
+        }
         amount.value = 0
+        tableData.value = []
     } else ElNotification.error(res.message)
 }
 
@@ -74,7 +129,7 @@ onMounted(async () => {
 <template>
     <div class="warp">
         <table-layout tableTitle="湖南工业学院校内超市收银台">
-            <el-form label-position="top" class="data-form" size="large" :inline="true">
+            <el-form label-position="top" class="data-form" size="large">
                 <el-form-item label="商品编号:" class="items-center">
                     <el-select v-model="product.id" filterable placeholder="Select" clearable @change="(val:number) => getProductInfo(val,'id')">
                         <el-option
@@ -95,11 +150,11 @@ onMounted(async () => {
                         />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="购买数量:" class="items-center">
+                    <el-input-number v-model="product.count" :min="0"/>
+                </el-form-item>
                 <el-form-item label="销售单价:" class="items-center">
                     ￥{{ product.nowPrice }}
-                </el-form-item>
-                <el-form-item label="购买数量:" class="items-center">
-                    <el-input-number v-model="buyCount" :min="0"/>
                 </el-form-item>
                 <el-form-item label="应付金额:" class="items-center">
                     ￥{{ amountPayable }}
@@ -110,10 +165,30 @@ onMounted(async () => {
                 <el-form-item label="找零:">
                     ￥{{ giveChange }}
                 </el-form-item>
-                <div></div>
-                <p></p>
-                <el-button type="primary" @click="submit">提交</el-button>
+                <el-form-item label="操作:" class="items-center">
+                    <el-button type="success" @click="addData">添加</el-button>
+                </el-form-item>
             </el-form>
+            <el-table :data="tableData">
+                <el-table-column label="商品编号" prop="id"></el-table-column>
+                <el-table-column label="商品名称" prop="name"></el-table-column>
+                <el-table-column label="购买数量" prop="count"></el-table-column>
+                <el-table-column label="售价">
+                    <template #default="{ row }">
+                        <span>￥{{ row.nowPrice.toFixed(2) }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="总价">
+                    <template #default="{ row }">
+                        <span>￥{{ (row.nowPrice * row.count).toFixed(2) }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="flex justify-end">
+                <div class="flex-1"></div>
+                <div class="flex-1"></div>
+                <el-button class="flex-1" type="primary" @click="submit" size="large">提交</el-button>
+            </div>
         </table-layout>
     </div>
 </template>
@@ -122,7 +197,7 @@ onMounted(async () => {
 .warp {
     @apply w-full mx-auto flex items-center;
     .data-form {
-        @apply bg-white p-4 rounded-md mx-auto w-fit gap-4 grid grid-cols-2;
+        @apply bg-white p-4 rounded-md mx-auto gap-4 grid grid-cols-4;
     }
 }
 </style>

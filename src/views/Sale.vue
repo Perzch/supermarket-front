@@ -4,8 +4,9 @@ import { api, request } from '@/request'
 import { ElNotification } from 'element-plus';
 import dayjs from 'dayjs';
 import TableLayout from '@/components/TableLayout.vue';
-import type { PageAble, SaleDto } from '@/interface';
+import type { PageAble, SaleDto, ResponseData, SaleData } from '@/interface';
 
+const sourceData:Ref = ref({})
 const tableData:Ref = ref([])
 const queryData:Ref<SaleDto> = ref({
     categoryName: undefined,
@@ -38,7 +39,21 @@ const getData:Function = async () => {
         }
     })).data)
     if(res.code === 200) {
-        tableData.value = res.data
+        sourceData.value = res.data
+        const data:any[] = []
+        sourceData.value.content.forEach((item:any) => {
+            data.push({
+                id: item.id,
+                createDate: item.createDate,
+                product: item.saleProducts.map((saleProduct:any) => {
+                    return {
+                        ...saleProduct.product,
+                        count: saleProduct.count
+                    }
+                })
+            })
+        })
+        tableData.value = data
     } else {
         ElNotification.error(res.message)
     }
@@ -119,38 +134,47 @@ onMounted(async () => {
                     <el-button type="primary" @click="getData">查询</el-button>
                 </el-form-item>
             </el-form>
-            <el-table border  :data="tableData.content" @sort-change="sortChange" header-row-class-name="text-black" table-layout="auto">
-                <el-table-column prop="id" label="编号" sortable="custom" width="100"/>
-                <el-table-column prop="product.id" label="商品编号" sortable="custom" width="120"/>
-                <el-table-column prop="product.name" label="商品名称" sortable="custom" width="120"/>
-                <el-table-column prop="product.categoryName" label="所属分类" sortable="custom" width="120"/>
-                <el-table-column label="进价" sortable="custom" width="100">
-                    <template #default="scope">
-                        <span>￥{{ scope.row.product.price.toFixed(2) }}</span>
+            <el-table border :data="tableData" @sort-change="sortChange" header-row-class-name="text-black" table-layout="auto">
+                <el-table-column prop="id" label="编号" sortable="custom" />
+                <el-table-column prop="createDate" label="创建时间" sortable="custom" />
+                <el-table-column>
+                    <template #header>
+                        <span>商品信息</span>
+                    </template>
+                    <template #default="{ row }">
+                        <el-table :data="row.product">
+                            <el-table-column label="商品编号" prop="id"></el-table-column>
+                            <el-table-column label="商品名称" prop="name"/>
+                            <el-table-column label="所属分类" prop="categoryName"/>
+                            <el-table-column label="进价">
+                                <template #default="{row}">
+                                    <span>￥{{ row.price.toFixed(2) }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="售价" prop="nowPrice">
+                                <template #default="{row}">
+                                    <span>￥{{ row.nowPrice.toFixed(2) }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="销量" prop="count"/>
+                            <el-table-column label="销售额">
+                                <template #default="{row}">
+                                    <span>￥{{ (row.count * row.nowPrice).toFixed(2) }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="净利润">
+                                <template #default="{row}">
+                                    <span>￥{{ (row.count * (row.nowPrice - row.price)).toFixed(2) }}</span>
+                                </template>
+                            </el-table-column>
+                        </el-table>
                     </template>
                 </el-table-column>
-                <el-table-column label="售价" sortable="custom" width="100">
-                    <template #default="scope">
-                        <span>￥{{ scope.row.product.nowPrice.toFixed(2) }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="saleCount" label="销量" sortable="custom" width="100"/>
-                <el-table-column label="销售额" width="100">
-                    <template #default="scope">
-                        <span>￥{{ (scope.row.product.nowPrice * scope.row.saleCount).toFixed(2) }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="净利润" width="100">
-                    <template #default="scope">
-                        <span>￥{{ ((scope.row.product.nowPrice - scope.row.product.price) * scope.row.saleCount).toFixed(2) }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="createDate" label="创建时间" sortable="custom" width="120"/>
             </el-table>
             <div class="flex justify-between p-2">
-                <p class="w-fit text-sm text-gray-500">共{{ tableData.totalElements }}条数据</p>
+                <p class="w-fit text-sm text-gray-500">共{{ sourceData.totalElements }}条数据</p>
                 <el-button type="success" @click="downloadAllData">下载全部数据</el-button>
-                <el-pagination layout="prev, pager, next" background :hide-on-single-page="true" :page-count="tableData.totalPages" v-model:current-page="pageComputed"/>
+                <el-pagination layout="prev, pager, next" background :hide-on-single-page="true" :page-count="sourceData.totalPages" v-model:current-page="pageComputed"/>
             </div>
         </table-layout>
     </div>

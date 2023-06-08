@@ -9,14 +9,15 @@ const authStore = useAuthStore()
 const user:User = reactive({
     username: '',
     password: '',
-    captcha: ''
+    captcha: '',
+    uuid: new Date().getTime()
 })
 const error = reactive({
     username: computed(() => user.username.trim().length < 3 || user.username.trim().length > 10),
     password: computed(() => user.password.trim().length < 6 || user.password.trim().length > 18),
     captcha: computed(() => user.captcha.trim() === '')
 })
-const captchaImg = ref('/api/auth/captcha?'+Math.random())
+const captchaImg = ref(`/api/auth/captcha?uuid=${user.uuid}&unless=${Math.random()}`)
 // 登录方法
 const login:Function = async () => {
     if (Object.values(error).some(item => item)) {
@@ -25,9 +26,10 @@ const login:Function = async () => {
     authStore.login({
         username: user.username,
         password: goEncrypt(user.password),
-        captcha: user.captcha
+        captcha: user.captcha,
+        uuid: user.uuid
     },router).catch(() => {
-        captchaImg.value = '/api/auth/captcha?'+Math.random()
+        captchaImg.value = `/api/auth/captcha?uuid=${user.uuid}&unless=${Math.random()}`
     })
 }
 const goEncrypt:Function = (data:string) :string =>{
@@ -69,7 +71,7 @@ onUnmounted(() => {
                     </el-form-item>
                     <el-form-item prop="captcha">
                         <template #label>验证码</template>
-                        <img :src="captchaImg" alt="图片验证码" title="点击再次获取验证码" @click="captchaImg = '/api/auth/captcha?'+Math.random()" class="cursor-pointer">
+                        <img :src="captchaImg" alt="图片验证码" title="点击再次获取验证码" @click="captchaImg = `/api/auth/captcha?uuid=${user.uuid}&unless=${Math.random()}`" class="cursor-pointer">
                         <el-input v-model="user.captcha" placeholder="验证码" clearable :class="{'error-input':error.captcha}"></el-input>
                         <el-text class="mx-1" :class="error.captcha?'opacity-100':'opacity-0'" type="danger" size="small">验证码不能为空</el-text>
                     </el-form-item>
