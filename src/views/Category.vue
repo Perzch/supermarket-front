@@ -92,7 +92,7 @@ const submitForm:Function = async () => {
 
 <template>
     <div class="warp" v-loading.fullscreen.lock="loading">
-        <table-layout tableTitle="湖南工业学院校内超市商品分类信息">
+        <table-layout tableTitle="某某大学学院校内超市商品分类信息">
             <div class="flex justify-end py-4">
                 <el-button size="large" type="success" @click="handleAdd">添加</el-button>
             </div>

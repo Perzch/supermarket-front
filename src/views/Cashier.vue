@@ -68,6 +68,10 @@ const addData:Function = async () => {
     }
 }
 
+const resetData:Function = () => {
+    tableData.value = []
+}
+
 const submit:Function = async () => {
     if(giveChange.value < 0) return ElNotification.error('实收金额不足!')
     // 提交saleCount和pid
@@ -128,7 +132,7 @@ onMounted(async () => {
 
 <template>
     <div class="warp">
-        <table-layout tableTitle="湖南工业学院校内超市收银台">
+        <table-layout tableTitle="某某大学学院校内超市收银台">
             <el-form label-position="top" class="data-form" size="large">
                 <el-form-item label="商品编号:" class="items-center">
                     <el-select v-model="product.id" filterable placeholder="Select" clearable @change="(val:number) => getProductInfo(val,'id')">
@@ -167,6 +171,7 @@ onMounted(async () => {
                 </el-form-item>
                 <el-form-item label="操作:" class="items-center">
                     <el-button type="success" @click="addData">添加</el-button>
+                    <el-button type="error" @click="resetData">清空</el-button>
                 </el-form-item>
             </el-form>
             <el-table :data="tableData">

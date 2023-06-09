@@ -99,7 +99,7 @@ onMounted(async () => {
 
 <template>
     <div class="warp" v-loading.fullscreen.lock="loading">
-        <table-layout tableTitle="湖南工业学院校内超市商品销售记录">
+        <table-layout tableTitle="某某大学学院校内超市商品销售记录">
             <el-form label-position="left" size="large" class="flex gap-4 justify-around">
                 <el-form-item label="商品类别:" class="items-center">
                     <el-select v-model="queryData.categoryName" filterable placeholder="Select" clearable >

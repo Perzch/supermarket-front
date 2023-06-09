@@ -147,7 +147,7 @@ onMounted(async () => {
 
 <template>
     <div class="warp" v-loading.fullscreen.lock="loading">
-        <table-layout tableTitle="湖南工业学院校内超市商品库存信息">
+        <table-layout tableTitle="某某大学学院校内超市商品库存信息">
             <el-form label-position="left" class="flex justify-around gap-4" size="large">
                 <el-form-item label="商品名称:" class="items-center">
                     <el-input v-model="queryData.name" placeholder="商品名称" />
