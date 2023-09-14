@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
       proxy: {
           "/api": {
+              // 8080为后端端口号，如果后端端口号为80，可省略
               target: "http://localhost:8080/api",
               changeOrigin: true,
               rewrite: (path) => path.replace(/^\/api/, ""),
