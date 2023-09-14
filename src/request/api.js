@@ -8,7 +8,7 @@ export const api = {
     productIds: 'product/ids',
     productNames:'product/names',
     sale: 'sale',
-    printSale: 'print/sale',//待开发
+    printSale: 'print/sale',
     printSales: 'print/sales'
 }
 export default api

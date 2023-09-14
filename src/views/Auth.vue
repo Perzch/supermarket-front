@@ -3,19 +3,20 @@ import {reactive, ref, onUnmounted} from 'vue';
 import {useAuthStore} from "store";
 import {useRouter} from "vue-router";
 import JSEncrypt from 'jsencrypt'
+const uuid = ref(Math.random().toString(36).substr(2))
 const router = useRouter()
 const authStore = useAuthStore()
 const user = reactive({
-    username: '',
-    password: '',
-    captcha: ''
+    username: 'admin',
+    password: '123456',
+    captcha: '111111',
 })
 const error = reactive({
     username: false,
     password: false,
     captcha: false
 })
-let captchaImg = ref('/api/auth/captcha?'+Math.random())
+let captchaImg = ref(`/api/auth/captcha?uuid=${uuid.value}`)
 // 验证用户名
 const validateUsername = () => {
     error.username = user.username.trim().length < 3 || user.username.trim().length > 10;
@@ -38,9 +39,11 @@ const login = async () => {
     await authStore.login({
         username: user.username,
         password: goEncrypt(user.password),
-        captcha: user.captcha
+        captcha: user.captcha,
+        uuid: uuid.value
     },router)
 }
+//密码加密
 const goEncrypt = (data) =>{
         const encryptor = new JSEncrypt()
         // 之前生成的公钥
@@ -55,6 +58,9 @@ const windowKeyDown = (e) => {
     if (e.keyCode === 13) {
         login()
     }
+}
+const refreshCaptcha = () => {
+  uuid.value = Math.random().toString(36).substr(2)
 }
 // 监听回车键
 window.addEventListener('keydown', windowKeyDown)
@@ -88,7 +94,7 @@ onUnmounted(() => {
                     </el-form-item>
                     <el-form-item prop="captcha">
                         <template #label>验证码</template>
-                        <img :src="captchaImg" alt="图片验证码" title="点击再次获取验证码" @click="captchaImg = '/api/auth/captcha?'+Math.random()" class="cursor-pointer">
+                        <img :src="`/api/auth/captcha?uuid=${uuid}`" alt="图片验证码" title="点击再次获取验证码" @click="refreshCaptcha" class="cursor-pointer">
                         <el-input v-model="user.captcha" placeholder="验证码" clearable :class="{'error-input':error.captcha}" @blur="validateCaptcha">
                             <template #suffix>
                                 <i class="fa-solid fa-triangle-exclamation text-danger" v-show="error.captcha"></i>
