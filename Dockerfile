@@ -7,8 +7,8 @@ RUN rm -rf /etc/nginx/conf.d/*
 # 将Vue项目的构建文件复制到Nginx的默认静态文件目录
 COPY dist/ /usr/share/nginx/html
 
-# 将Vue项目的构建文件挂载到Nginx的默认静态文件目录(无效)
-# VOLUME /usr/share/nginx/html
+# 将dist文件夹挂载到Nginx的默认静态文件目录(无效,正确写法还在寻找= =)
+#VOLUME dist/ /usr/share/nginx/html
 
 # 复制自定义Nginx配置文件（如果需要）
 COPY nginx.conf /etc/nginx/conf.d/default.conf
